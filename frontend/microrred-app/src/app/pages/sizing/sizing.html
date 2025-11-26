@@ -1,0 +1,331 @@
+<div class="sizing-page">
+
+  <h1>Dimensionamiento de Microrred</h1>
+  <p class="subtitle">
+    Cada ZNI requiere 4 archivos:
+    <strong>instance_data</strong>, <strong>parameters</strong>,
+    <strong>demand</strong> y <strong>forecast</strong>.
+    Escoge el tipo de modelo, ajusta los parámetros y carga los archivos para ejecutar el dimensionamiento.
+  </p>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'upload'"
+      (click)="goTo('upload')">
+      1. Carga de archivos
+    </button>
+
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'results'"
+      (click)="goTo('results')"
+      [disabled]="!resultsReady">
+      2. Resultados
+    </button>
+  </div>
+
+  <!-- Mensaje de error global -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- ================== TAB: CARGA DE ARCHIVOS ================== -->
+  <section *ngIf="activeTab === 'upload'" class="card upload-card">
+
+    <h2>Carga de archivos para una ZNI</h2>
+
+    <p class="example">
+      Ejemplo: <code>instance_data_Leticia.json</code>,
+      <code>parameters_Leticia.json</code>,
+      <code>demand_Leticia.csv</code>,
+      <code>forecast_Leticia.csv</code>.
+    </p>
+
+    <!-- Modo de optimización -->
+    <div class="field-row">
+      <label for="mode"><strong>Modo de optimización</strong></label>
+      <select id="mode" [(ngModel)]="mode">
+        <option value="deterministic">Modelo determinístico (1 año)</option>
+        <option value="multiyear">Modelo multiyear</option>
+      </select>
+    </div>
+
+    <!-- Parámetros editables -->
+    <div class="params-grid">
+      <div class="field-row">
+        <label for="years">
+          Horizonte del proyecto (años)
+        </label>
+        <input
+          id="years"
+          type="number"
+          min="1"
+          [(ngModel)]="years" />
+      </div>
+
+      <div class="field-row">
+        <label for="demandCovered">
+          Porcentaje de demanda a cubrir (entre 0 y 1)
+        </label>
+        <input
+          id="demandCovered"
+          type="number"
+          step="0.01"
+          min="0"
+          max="1"
+          [(ngModel)]="demandCovered" />
+      </div>
+
+      <div class="field-row">
+        <label for="discountRate">
+          Tasa de descuento (i_f)
+        </label>
+        <input
+          id="discountRate"
+          type="number"
+          step="0.01"
+          min="0"
+          [(ngModel)]="discountRate" />
+      </div>
+
+      <div class="field-row">
+        <label for="lpspLimit">
+          Límite de LPSP (horas sin servicio permitidas) (tlpsp)
+        </label>
+        <input
+          id="lpspLimit"
+          type="number"
+          min="0"
+          [(ngModel)]="lpspLimit" />
+      </div>
+    </div>
+
+    <!-- Archivos -->
+    <div class="files-grid">
+
+      <!-- 1. instance_data -->
+      <div class="file-block">
+        <h3>1. instance_data (JSON)</h3>
+        <p>Parámetros globales del caso (horizonte, tasa de descuento, etc.).</p>
+        <input
+          type="file"
+          accept=".json"
+          (change)="onFileSelected('instance', $event)" />
+        <p class="file-name">
+          {{ instanceFileName || 'Ningún archivo seleccionado.' }}
+        </p>
+      </div>
+
+      <!-- 2. parameters -->
+      <div class="file-block">
+        <h3>2. parameters (JSON)</h3>
+        <p>Catálogo de generadores, baterías, fotovoltaico, costos, etc.</p>
+        <input
+          type="file"
+          accept=".json"
+          (change)="onFileSelected('parameters', $event)" />
+        <p class="file-name">
+          {{ parametersFileName || 'Ningún archivo seleccionado.' }}
+        </p>
+      </div>
+
+      <!-- 3. demand -->
+      <div class="file-block">
+        <h3>3. demand (CSV)</h3>
+        <p>Curva horaria de demanda de la ZNI (kWh/hora).</p>
+        <input
+          type="file"
+          accept=".csv"
+          (change)="onFileSelected('demand', $event)" />
+        <p class="file-name">
+          {{ demandFileName || 'Ningún archivo seleccionado.' }}
+        </p>
+      </div>
+
+      <!-- 4. forecast -->
+      <div class="file-block">
+        <h3>4. forecast (CSV)</h3>
+        <p>Serie de irradiancia / recurso renovable utilizada en el dimensionamiento.</p>
+        <input
+          type="file"
+          accept=".csv"
+          (change)="onFileSelected('forecast', $event)" />
+        <p class="file-name">
+          {{ forecastFileName || 'Ningún archivo seleccionado.' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="actions">
+      <button
+        type="button"
+        class="btn primary"
+        [disabled]="!allFilesSelected || isProcessing"
+        (click)="onProcess()">
+        <ng-container *ngIf="!isProcessing; else processingTpl">
+          Procesar dimensionamiento
+        </ng-container>
+      </button>
+
+      <ng-template #processingTpl>
+        Procesando…
+      </ng-template>
+
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="isProcessing"
+        (click)="reset()">
+        Reiniciar
+      </button>
+    </div>
+
+    <p class="hint">
+      Debes seleccionar los 4 archivos para poder procesar el dimensionamiento.
+    </p>
+
+    <p *ngIf="isProcessing" class="running-msg">
+      Ejecutando dimensionamiento en el backend…
+      Esta operación puede tardar algunos segundos según los archivos de entrada.
+    </p>
+  </section>
+
+  <!-- ================== TAB: RESULTADOS ================== -->
+  <section *ngIf="activeTab === 'results'" class="card results-card">
+
+    <h2>Resultados del dimensionamiento</h2>
+
+    <ng-container *ngIf="resultsReady && summary as s; else noResultsTpl">
+
+      <!-- Tabla resumen tipo Excel -->
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th>Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Lcoe</td>
+            <td>
+              <ng-container *ngIf="s.lcoe !== null; else dashTpl">
+                {{ s.lcoe | number:'1.6-6' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>area</td>
+            <td>
+              <ng-container *ngIf="s.area !== null; else dashTpl">
+                {{ s.area | number:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>lpsp mean</td>
+            <td>
+              <ng-container *ngIf="s.lpsp_mean !== null; else dashTpl">
+                {{ s.lpsp_mean | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>mean surplus</td>
+            <td>
+              <ng-container *ngIf="s.mean_surplus !== null; else dashTpl">
+                {{ s.mean_surplus | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>mean diesel generation</td>
+            <td>
+              <ng-container *ngIf="s.mean_diesel_generation !== null; else dashTpl">
+                {{ s.mean_diesel_generation | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>mean eolic generation</td>
+            <td>
+              <ng-container *ngIf="s.mean_eolic_generation !== null; else dashTpl">
+                {{ s.mean_eolic_generation | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>mean solar generation</td>
+            <td>
+              <ng-container *ngIf="s.mean_solar_generation !== null; else dashTpl">
+                {{ s.mean_solar_generation | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+          <tr>
+            <td>mean batteries generation</td>
+            <td>
+              <ng-container *ngIf="s.mean_batteries_generation !== null; else dashTpl">
+                {{ s.mean_batteries_generation | percent:'1.2-2' }}
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #dashTpl>
+        <span>—</span>
+      </ng-template>
+
+      <!-- Archivos Excel -->
+      <div class="downloads" *ngIf="excelReports.length">
+        <h3>Archivos generados (Excel)</h3>
+        <ul>
+          <li *ngFor="let f of excelReports">
+            <a [href]="downloadUrl(f)" target="_blank" rel="noopener">
+              Descargar {{ f }}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Imágenes embebidas (por si las generas) -->
+      <div class="image-results" *ngIf="imageReports.length">
+        <h3>Gráficos del dimensionamiento</h3>
+        <div class="image-list">
+          <img
+            *ngFor="let img of imageReports"
+            [src]="downloadUrl(img)"
+            [alt]="img"
+            class="result-image" />
+        </div>
+      </div>
+
+      <!-- Gráficos interactivos (HTML) -->
+      <div class="html-results" *ngIf="htmlReports.length">
+        <h3>Gráficos interactivos</h3>
+        <ul>
+          <li *ngFor="let h of htmlReports">
+            <a [href]="downloadUrl(h)" target="_blank" rel="noopener">
+              Ver gráfico interactivo ({{ h }})
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </ng-container>
+
+    <ng-template #noResultsTpl>
+      <p>
+        Aún no hay resultados para mostrar. Ejecuta el modelo desde la pestaña
+        <strong>"Carga de archivos"</strong>.
+      </p>
+    </ng-template>
+  </section>
+
+</div>

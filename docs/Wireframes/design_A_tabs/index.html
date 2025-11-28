@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diseño A – Tabs superiores</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <strong>Universidad de Antioquia</strong> · Sizing Microgrids
+</header>
+<main>
+  <h1>Dimensionamiento de Microrred – Diseño A (Tabs)</h1>
+  <p>Diseño con navegación por pestañas en la parte superior.</p>
+
+  <div class="section">
+    <span class="badge">1. Carga de archivos</span>
+    <span class="badge">2. Parámetros</span>
+    <span class="badge">3. Resultados</span>
+  </div>
+
+  <div class="section">
+    <h2>Carga de archivos</h2>
+    <p>Pestaña activa con los cuatro archivos requeridos.</p>
+    <div class="grid">
+      <div>
+        <label>instance_data (JSON)</label>
+        <input type="file" />
+      </div>
+      <div>
+        <label>parameters (JSON)</label>
+        <input type="file" />
+      </div>
+      <div>
+        <label>demand (CSV)</label>
+        <input type="file" />
+      </div>
+      <div>
+        <label>forecast (CSV)</label>
+        <input type="file" />
+      </div>
+    </div>
+    <button class="btn">Validar archivos</button>
+    <button class="btn">Ejecutar dimensionamiento</button>
+  </div>
+</main>
+</body>
+</html>

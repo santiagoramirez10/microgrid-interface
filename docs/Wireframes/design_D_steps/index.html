@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diseño D – Pasos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>Universidad de Antioquia – Diseño D (wizard por pasos)</header>
+<main>
+  <h1>Asistente para dimensionar una microrred</h1>
+  <p>Interfaz tipo "wizard" donde el usuario avanza paso a paso.</p>
+  <div class="steps">
+    <div class="step done">1. Datos generales</div>
+    <div class="step active">2. Archivos y parámetros</div>
+    <div class="step">3. Resumen</div>
+    <div class="step">4. Resultados</div>
+  </div>
+
+  <div class="section">
+    <h2>Paso 2 – Archivos y parámetros</h2>
+    <label>instance_data</label>
+    <input type="file" />
+    <label>parameters</label>
+    <input type="file" />
+    <label>demand</label>
+    <input type="file" />
+    <label>forecast</label>
+    <input type="file" />
+    <label>Modo de optimización</label>
+    <select><option>Determinístico</option><option>Multianual</option></select>
+  </div>
+  <button class="btn">Anterior</button>
+  <button class="btn">Siguiente</button>
+</main>
+</body>
+</html>

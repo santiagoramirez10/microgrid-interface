@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diseño C – Tarjetas</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  UdeA · Herramienta de dimensionamiento de microrredes – Diseño C
+</header>
+<main>
+  <h1>Configuración del caso</h1>
+  <p>Diseño con bloques tipo tarjeta para cada grupo de información.</p>
+  <div class="cards">
+    <div class="card">
+      <h2>1. Información general</h2>
+      <label>Nombre del proyecto</label>
+      <input type="text" />
+      <label>Zona / ZNI</label>
+      <input type="text" />
+    </div>
+    <div class="card">
+      <h2>2. Parámetros económicos</h2>
+      <label>Tasa de descuento</label>
+      <input type="number" />
+      <label>Límite de LPSP (h/año)</label>
+      <input type="number" />
+    </div>
+    <div class="card">
+      <h2>3. Archivos requeridos</h2>
+      <label>Subir paquete de archivos (.zip)</label>
+      <input type="file" />
+    </div>
+  </div>
+  <button class="btn">Continuar a resultados</button>
+</main>
+</body>
+</html>

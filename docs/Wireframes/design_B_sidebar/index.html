@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diseño B – Sidebar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <strong>UdeA – Dimensionador de Microrredes</strong>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Flujo</h2>
+    <ul>
+      <li>Inicio</li>
+      <li><strong>Carga y parámetros</strong></li>
+      <li>Resultados</li>
+      <li>Exportar</li>
+    </ul>
+  </aside>
+  <main>
+    <h1>Diseño B (menú lateral)</h1>
+    <p>Diseño con navegación en barra lateral izquierda.</p>
+    <div class="section">
+      <h2>Datos de proyecto</h2>
+      <label>Nombre del caso</label>
+      <input type="text" />
+      <label>Horizonte (años)</label>
+      <input type="number" />
+      <label>Modo de optimización</label>
+      <select><option>Determinístico</option><option>Estocástico</option></select>
+    </div>
+    <div class="section">
+      <h2>Archivos</h2>
+      <label>Archivos principales</label>
+      <input type="file" />
+    </div>
+    <button class="btn">Guardar configuración</button>
+  </main>
+</div>
+</body>
+</html>
